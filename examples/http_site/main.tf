@@ -1,6 +1,6 @@
 module "site" {
   source      = "../../"
-  domain      = "jniesen"
-  tld         = "me"
-  force_https = "false"
+  domain      = "${var.domain}"
+  tld         = "${var.tld}"
+  force_https = "${var.force_https}"
 }
