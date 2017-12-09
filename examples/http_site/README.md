@@ -14,3 +14,6 @@ domain="example"
 tld="org"
 force_https="false"
 ```
+
+Once you've populated a `terraform.tfvars` with your values, go ahead and run a
+`terraform apply .`.
