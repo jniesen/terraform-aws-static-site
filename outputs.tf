@@ -1,23 +1,23 @@
 output "www_bucket" {
   value = {
-    "id"                 = "${aws_s3_bucket.www.id}"
-    "arn"                = "${aws_s3_bucket.www.arn}"
-    "bucket_domain_name" = "${aws_s3_bucket.www.bucket_domain_name}"
-    "hosted_zone_id"     = "${aws_s3_bucket.www.hosted_zone_id}"
-    "region"             = "${aws_s3_bucket.www.region}"
-    "website_endpoint"   = "${aws_s3_bucket.www.website_endpoint}"
-    "website_domain"     = "${aws_s3_bucket.www.website_domain}"
+    "id"                 = "${module.www.bucket["id"]}"
+    "arn"                = "${module.www.bucket["arn"]}"
+    "bucket_domain_name" = "${module.www.bucket["bucket_domain_name"]}"
+    "hosted_zone_id"     = "${module.www.bucket["hosted_zone_id"]}"
+    "region"             = "${module.www.bucket["region"]}"
+    "website_endpoint"   = "${module.www.bucket["website_endpoint"]}"
+    "website_domain"     = "${module.www.bucket["website_domain"]}"
   }
 }
 
 output "root_bucket" {
   value = {
-    "id"                 = "${aws_s3_bucket.root.id}"
-    "arn"                = "${aws_s3_bucket.root.arn}"
-    "bucket_domain_name" = "${aws_s3_bucket.root.bucket_domain_name}"
-    "hosted_zone_id"     = "${aws_s3_bucket.root.hosted_zone_id}"
-    "region"             = "${aws_s3_bucket.root.region}"
-    "website_endpoint"   = "${aws_s3_bucket.root.website_endpoint}"
-    "website_domain"     = "${aws_s3_bucket.root.website_domain}"
+    "id"                 = "${module.root.bucket["id"]}"
+    "arn"                = "${module.root.bucket["arn"]}"
+    "bucket_domain_name" = "${module.root.bucket["bucket_domain_name"]}"
+    "hosted_zone_id"     = "${module.root.bucket["hosted_zone_id"]}"
+    "region"             = "${module.root.bucket["region"]}"
+    "website_endpoint"   = "${module.root.bucket["website_endpoint"]}"
+    "website_domain"     = "${module.root.bucket["website_domain"]}"
   }
 }
