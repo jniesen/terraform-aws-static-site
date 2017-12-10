@@ -26,10 +26,6 @@ variable "force_https" {
   default     = "true"
 }
 
-variable "site_source" {
-  description = "A local path to a website source that will be uploaded to S3. Default: false (site source is not managed)."
-}
-
 #
 # REQUIRED
 #
