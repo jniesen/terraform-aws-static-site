@@ -26,6 +26,16 @@ variable "force_https" {
   default     = "true"
 }
 
+variable "site_source" {
+  description = "The absolute path to the site's source files on your local machine."
+  default = "false"
+}
+
+variable "deploy_content" {
+  description = "Whether this module should manage site deployment. Default: false (it should not)."
+  default = "false"
+}
+
 #
 # REQUIRED
 #

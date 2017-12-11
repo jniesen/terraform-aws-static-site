@@ -30,3 +30,11 @@ module "www" {
   bucket_name = "${module.strings.fqdn}"
   root_name   = "${module.strings.domain_name}"
 }
+
+module "deploy" {
+  source = "modules/deployment"
+
+  deploy_content = "${var.deploy_content}"
+  root_name      = "${module.strings.domain_name}"
+  site_source    = "${var.site_source}"
+}
