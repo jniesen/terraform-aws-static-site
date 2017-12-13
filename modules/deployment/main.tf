@@ -1,16 +1,39 @@
 data "archive_file" "src" {
-  count       = "${var.deploy_content == "false" ? 0 : 1}"
+  count = "${var.deploy_content == "false" ? 0 : 1}"
 
   type        = "zip"
   source_dir  = "${var.site_source}"
   output_path = "source.zip"
 }
 
-resource "aws_s3_bucket" "src" {
-  count       = "${var.deploy_content == "false" ? 0 : 1}"
+data "template_file" "buildspec" {
+  count    = "${var.deploy_content == "false" ? 0 : 1}"
+  template = "${file("${path.module}/templates/buildspec.yaml.tpl")}"
 
-  bucket = "source-${var.root_name}"
-  acl    = "private"
+  vars {
+    dest_bucket = "${var.root_name}"
+  }
+}
+
+data "template_file" "service_policy" {
+  count    = "${var.deploy_content == "false" ? 0 : 1}"
+  template = "${file("${path.module}/templates/service_policy.json.tpl")}"
+
+  vars {
+    src_bucket  = "${aws_s3_bucket.src.id}"
+    dest_bucket = "${var.root_name}"
+  }
+}
+
+resource "aws_s3_bucket" "src" {
+  count = "${var.deploy_content == "false" ? 0 : 1}"
+
+  bucket     = "source-${var.root_name}"
+  acl        = "private"
+
+  versioning {
+    enabled = "true"
+  }
 
   tags {
     Name = "source-${var.root_name}"
@@ -18,16 +41,29 @@ resource "aws_s3_bucket" "src" {
 }
 
 resource "aws_s3_bucket_object" "src" {
-  count       = "${var.deploy_content == "false" ? 0 : 1}"
+  count = "${var.deploy_content == "false" ? 0 : 1}"
 
   bucket = "${aws_s3_bucket.src.id}"
-  key    = "source-${data.archive_file.src.output_md5}.zip"
+  key    = "source.zip"
   source = "source.zip"
   etag   = "${data.archive_file.src.output_md5}"
 }
 
+resource "aws_iam_role_policy" "build" {
+  name   = "StaticSiteCodeBuildServicePolicy"
+  role   = "${aws_iam_role.build.id}"
+  policy = "${data.template_file.service_policy.rendered}"
+}
+
+resource "aws_iam_role" "build" {
+  name = "StaticSiteCodeBuildServiceRole"
+  assume_role_policy = "${file("${path.module}/files/assume_role_policy.json")}"
+}
+
 resource "aws_codebuild_project" "src" {
-  count       = "${var.deploy_content == "false" ? 0 : 1}"
+  count        = "${var.deploy_content == "false" ? 0 : 1}"
+  name         = "${replace(var.root_name, ".", "-")}"
+  service_role = "${aws_iam_role.build.arn}"
 
   environment {
     type         = "LINUX_CONTAINER"
@@ -40,7 +76,8 @@ resource "aws_codebuild_project" "src" {
   }
 
   source {
-    type = "S3"
-    location = "${aws_s3_bucket_object.src.id}"
+    type      = "S3"
+    location  = "${aws_s3_bucket.src.arn}/${aws_s3_bucket_object.src.id}"
+    buildspec = "${data.template_file.buildspec.rendered}"
   }
 }
